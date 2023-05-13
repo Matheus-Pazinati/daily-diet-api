@@ -1,9 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export async function checkAuthCookie(request: FastifyRequest, reply: FastifyReply) {
-  const { authCookie } = request.cookies
+  const { AuthCookie } = request.cookies
 
-  if (!authCookie) {
+  if (!AuthCookie) {
     reply.status(401).send({
       error: 'Unauthorized'
     })
