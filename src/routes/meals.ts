@@ -1,6 +1,8 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { checkAuthCookie } from "../middlewares/check-auth";
+import { knex } from "../database";
+import { randomUUID } from 'node:crypto'
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post('/meals', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -12,6 +14,19 @@ export async function mealsRoutes(app: FastifyInstance) {
       onDiet: z.boolean(),
     })
 
-    const { mealDate } = MealRequestSchema.parse(request.body)
+    const { name, description, mealDate, onDiet } = MealRequestSchema.parse(request.body)
+
+    const userId = request.cookies.AuthCookie
+
+    await knex('meals').insert({
+      id: randomUUID(),
+      name,
+      description,
+      meal_date: mealDate,
+      on_diet: onDiet,
+      user_id: userId
+    })
+
+    reply.status(201).send()
   })
 }
