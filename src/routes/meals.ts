@@ -41,4 +41,23 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     reply.status(200).send(meals)
   })
+
+  app.get('/meals/:id', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const MealIdSchema = z.object({
+      id: z.string().uuid()
+    })
+
+    const { id } = MealIdSchema.parse(request.params)
+    const userId = request.cookies.AuthCookie
+    
+    const meal = await knex('meals')
+    .where({
+      id,
+      user_id: userId
+    })
+    .select()
+    .first()
+
+    reply.status(200).send(meal)
+  })
 }
