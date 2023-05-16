@@ -29,4 +29,16 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     reply.status(201).send()
   })
+
+  app.get('/meals', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const userId = request.cookies.AuthCookie
+
+    const meals = await knex('meals')
+    .where({
+      user_id: userId
+    })
+    .select()
+
+    reply.status(200).send(meals)
+  })
 }
