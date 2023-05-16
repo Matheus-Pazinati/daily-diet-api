@@ -5,7 +5,7 @@ import { knex } from "../database";
 import { randomUUID } from 'node:crypto'
 
 export async function mealsRoutes(app: FastifyInstance) {
-  app.post('/meals', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
+  app.post('/', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
     const MealRequestSchema = z.object({
       name: z.string().min(2, { message: "O nome da refeição deve conter no mínimo dois caracteres" }),
       description: z.string().min(2, { message: "A descrição da refeição deve conter no mínimo dois caracteres" }),
@@ -30,7 +30,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     reply.status(201).send()
   })
 
-  app.get('/meals', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
+  app.get('/', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
     const userId = request.cookies.AuthCookie
 
     const meals = await knex('meals')
@@ -42,7 +42,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     reply.status(200).send(meals)
   })
 
-  app.get('/meals/:id', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
+  app.get('/:id', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
     const MealIdSchema = z.object({
       id: z.string().uuid()
     })
