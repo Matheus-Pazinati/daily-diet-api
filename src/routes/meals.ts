@@ -60,4 +60,33 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     reply.status(200).send(meal)
   })
+
+  app.put('/:id', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const MealIdSchema = z.object({
+      id: z.string().uuid()
+    })
+
+    const UpdatedMealRequestSchema = z.object({
+      name: z.string().min(2, { message: "O nome da refeição deve conter no mínimo dois caracteres" }).optional(),
+      description: z.string().min(2, { message: "A descrição da refeição deve conter no mínimo dois caracteres" }).optional(),
+      meal_date: z.string().datetime({ message: "Formato de data inválido" })
+      .transform((val) => new Date(val).getTime()).optional(),
+      on_diet: z.boolean().optional(),
+    })
+
+    const { id } = MealIdSchema.parse(request.params)
+    const userId = request.cookies.AuthCookie
+    const updatedMealValues = UpdatedMealRequestSchema.parse(request.body)
+    
+    await knex('meals')
+    .where({
+      id,
+      user_id: userId
+    })
+    .update({
+      ...updatedMealValues
+    })
+
+    reply.status(204).send()
+  })
 }
