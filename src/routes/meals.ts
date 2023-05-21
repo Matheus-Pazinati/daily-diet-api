@@ -6,7 +6,7 @@ import { randomUUID } from 'node:crypto'
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post('/', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const MealRequestSchema = z.object({
+    const MealSchema = z.object({
       name: z.string().min(2, { message: "O nome da refeição deve conter no mínimo dois caracteres" }),
       description: z.string().min(2, { message: "A descrição da refeição deve conter no mínimo dois caracteres" }),
       mealDate: z.string().datetime({ message: "Formato de data inválido" })
@@ -14,9 +14,9 @@ export async function mealsRoutes(app: FastifyInstance) {
       onDiet: z.boolean(),
     })
 
-    const { name, description, mealDate, onDiet } = MealRequestSchema.parse(request.body)
+    const { name, description, mealDate, onDiet } = MealSchema.parse(request.body)
 
-    const userId = request.cookies.AuthCookie
+    const authenticatedUserId = request.cookies.AuthCookie
 
     await knex('meals').insert({
       id: randomUUID(),
@@ -24,18 +24,18 @@ export async function mealsRoutes(app: FastifyInstance) {
       description,
       meal_date: mealDate,
       on_diet: onDiet,
-      user_id: userId
+      user_id: authenticatedUserId
     })
 
     reply.status(201).send()
   })
 
   app.get('/', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const userId = request.cookies.AuthCookie
+    const authenticatedUserId = request.cookies.AuthCookie
 
     const meals = await knex('meals')
     .where({
-      user_id: userId
+      user_id: authenticatedUserId
     })
     .select()
 
@@ -43,11 +43,11 @@ export async function mealsRoutes(app: FastifyInstance) {
   })
 
   app.get('/:id', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const MealIdSchema = z.object({
+    const MealParameterSchema = z.object({
       id: z.string().uuid()
     })
 
-    const { id } = MealIdSchema.parse(request.params)
+    const { id } = MealParameterSchema.parse(request.params)
     const userId = request.cookies.AuthCookie
     
     const meal = await knex('meals')
@@ -62,11 +62,11 @@ export async function mealsRoutes(app: FastifyInstance) {
   })
 
   app.put('/:id', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const MealIdSchema = z.object({
+    const MealParameterSchema = z.object({
       id: z.string().uuid()
     })
 
-    const UpdatedMealRequestSchema = z.object({
+    const UpdatedMealSchema = z.object({
       name: z.string().min(2, { message: "O nome da refeição deve conter no mínimo dois caracteres" }).optional(),
       description: z.string().min(2, { message: "A descrição da refeição deve conter no mínimo dois caracteres" }).optional(),
       meal_date: z.string().datetime({ message: "Formato de data inválido" })
@@ -74,14 +74,14 @@ export async function mealsRoutes(app: FastifyInstance) {
       on_diet: z.boolean().optional(),
     })
 
-    const { id } = MealIdSchema.parse(request.params)
-    const userId = request.cookies.AuthCookie
-    const updatedMealValues = UpdatedMealRequestSchema.parse(request.body)
+    const { id } = MealParameterSchema.parse(request.params)
+    const authenticatedUserId = request.cookies.AuthCookie
+    const updatedMealValues = UpdatedMealSchema.parse(request.body)
     
     await knex('meals')
     .where({
       id,
-      user_id: userId
+      user_id: authenticatedUserId
     })
     .update({
       ...updatedMealValues
@@ -91,17 +91,17 @@ export async function mealsRoutes(app: FastifyInstance) {
   })
 
   app.delete('/:id', { preHandler: [checkAuthCookie] }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const MealIdSchema = z.object({
+    const MealParameterSchema = z.object({
       id: z.string().uuid()
     })
 
-    const { id } = MealIdSchema.parse(request.params)
-    const userId = request.cookies.AuthCookie
+    const { id } = MealParameterSchema.parse(request.params)
+    const authenticatedUserId = request.cookies.AuthCookie
 
     await knex('meals')
     .where({
       id,
-      user_id: userId
+      user_id: authenticatedUserId
     })
     .del()
 
