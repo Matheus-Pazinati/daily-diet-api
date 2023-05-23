@@ -23,6 +23,7 @@ export async function signIn(app: FastifyInstance) {
         path: '/',
         maxAge: 1000 * 60 * 60 * 24 * 3 // 3 days
       })
+      .status(200).send()
     } else {
       reply.status(401).send()
     }

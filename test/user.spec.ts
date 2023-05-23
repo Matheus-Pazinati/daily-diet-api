@@ -1,4 +1,4 @@
-import { describe, it, beforeAll, afterAll, expect, beforeEach } from 'vitest'
+import { describe, it, beforeAll, afterAll, beforeEach } from 'vitest'
 import { app } from '../src/app'
 import { execSync } from 'node:child_process'
 import request from 'supertest'
@@ -27,5 +27,24 @@ describe('User routes', () => {
       confirmPassword: "123456"
     })
     .expect(201)
+  })
+
+  it('should sign in user', async () => {
+    await request(app.server)
+    .post('/users')
+    .send({
+      name: "Matheus",
+      email: "matheus@email.com",
+      password: "123456",
+      confirmPassword: "123456"
+    })
+
+    await request(app.server)
+    .post('/signin')
+    .send({
+      email: "matheus@email.com",
+      password: "123456"
+    })
+    .expect(200)
   })
 })
