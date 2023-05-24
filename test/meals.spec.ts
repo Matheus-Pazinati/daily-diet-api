@@ -119,4 +119,51 @@ describe('Meals and user routes', () => {
       })
     ])
   })
+
+  it("should list a meal", async () => {
+    await request(app.server)
+    .post('/users')
+    .send({
+      name: "Matheus",
+      email: "matheus@email.com",
+      password: "123456",
+      confirmPassword: "123456"
+    })
+
+    const signedUser = await request(app.server)
+    .post('/signin')
+    .send({
+      email: "matheus@email.com",
+      password: "123456"
+    })
+
+    const authCookie = signedUser.headers['set-cookie']
+
+    await request(app.server)
+    .post('/meals')
+    .set("Cookie", authCookie)
+    .send({
+      name: "Macarrão",
+      description: "Macarrão pizza",
+      mealDate: "2023-05-04T15:00:00Z",
+      onDiet: false
+    })
+
+    const mealsResponse = await request(app.server)
+    .get('/meals')
+    .set("Cookie", authCookie)
+
+    const mealId = mealsResponse.body[0].id
+
+    const mealResponse = await request(app.server)
+    .get(`/meals/${mealId}`)
+    .set("Cookie", authCookie)
+
+    expect(mealResponse.body).toEqual(
+      expect.objectContaining({
+        name: "Macarrão",
+        description: "Macarrão pizza"
+      })
+    )
+  })
 })
