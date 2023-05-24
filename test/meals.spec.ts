@@ -167,7 +167,7 @@ describe('Meals and user routes', () => {
     )
   })
 
-  it.only("should update a meal", async () => {
+  it("should update a meal", async () => {
     await request(app.server)
     .post('/users')
     .send({
@@ -206,10 +206,102 @@ describe('Meals and user routes', () => {
     .put(`/meals/${mealId}`)
     .send({
       name: "Pizza",
-      description: "Rodízio de pizza"
+      description: "Rodíqzio de pizza"
     })
     .set("Cookie", authCookie)
     .expect(204)
+  })
 
+  it("should delete a meal", async () => {
+    await request(app.server)
+    .post('/users')
+    .send({
+      name: "Matheus",
+      email: "matheus@email.com",
+      password: "123456",
+      confirmPassword: "123456"
+    })
+
+    const signedUser = await request(app.server)
+    .post('/signin')
+    .send({
+      email: "matheus@email.com",
+      password: "123456"
+    })
+
+    const authCookie = signedUser.headers['set-cookie']
+
+    await request(app.server)
+    .post('/meals')
+    .set("Cookie", authCookie)
+    .send({
+      name: "Macarrão",
+      description: "Macarrão pizza",
+      mealDate: "2023-05-04T15:00:00Z",
+      onDiet: false
+    })
+
+    const mealsResponse = await request(app.server)
+    .get('/meals')
+    .set("Cookie", authCookie)
+
+    const mealId = mealsResponse.body[0].id
+
+    await request(app.server)
+    .delete(`/meals/${mealId}`)
+    .set("Cookie", authCookie)
+    .expect(204)
+  })
+
+  it("should list user status", async () => {
+    await request(app.server)
+    .post('/users')
+    .send({
+      name: "Matheus",
+      email: "matheus@email.com",
+      password: "123456",
+      confirmPassword: "123456"
+    })
+
+    const signedUser = await request(app.server)
+    .post('/signin')
+    .send({
+      email: "matheus@email.com",
+      password: "123456"
+    })
+
+    const authCookie = signedUser.headers['set-cookie']
+
+    await request(app.server)
+    .post('/meals')
+    .set("Cookie", authCookie)
+    .send({
+      name: "Macarrão",
+      description: "Macarrão pizza",
+      mealDate: "2023-05-04T15:00:00Z",
+      onDiet: false
+    })
+
+    await request(app.server)
+    .post('/meals')
+    .set("Cookie", authCookie)
+    .send({
+      name: "Salada",
+      description: "Salade de folhas",
+      mealDate: "2023-05-04T15:00:00Z",
+      onDiet: true
+    })
+
+    const profileStatus = await request(app.server)
+    .get("/profile")
+    .set("Cookie", authCookie)
+
+    expect(profileStatus.body).toEqual(
+      expect.objectContaining({
+        mealsAmount: 2,
+        mealsOnDiet: 1,
+        mealsOutDiet: 1
+      })
+    )
   })
 })
