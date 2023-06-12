@@ -4,6 +4,19 @@ import request from 'supertest'
 import { execSync } from 'node:child_process'
 
 describe('Meals and user routes', () => {
+
+  async function createUser() {
+    const user = await request(app.server)
+    .post('/users')
+    .send({
+      name: "Matheus",
+      email: "matheus@email.com",
+      password: "123456",
+      confirmPassword: "123456"
+    })
+    return user
+  }
+
   beforeAll( async () => {
     await app.ready()
   })
@@ -18,15 +31,8 @@ describe('Meals and user routes', () => {
   })
 
   it('should create a user', async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
-      name: "Matheus",
-      email: "matheus@email.com",
-      password: "123456",
-      confirmPassword: "123456"
-    })
-    .expect(201)
+    const createUserRequest = await createUser()
+    expect(createUserRequest.status).toBe(201)
   })
 
   it('should sign in user', async () => {
@@ -49,14 +55,7 @@ describe('Meals and user routes', () => {
   })
 
   it("should create a meal", async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
-      name: "Matheus",
-      email: "matheus@email.com",
-      password: "123456",
-      confirmPassword: "123456"
-    })
+    createUser()
 
     const signedUser = await request(app.server)
     .post('/signin')
@@ -80,14 +79,7 @@ describe('Meals and user routes', () => {
   })
 
   it("should list all meals", async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
-      name: "Matheus",
-      email: "matheus@email.com",
-      password: "123456",
-      confirmPassword: "123456"
-    })
+    createUser()
 
     const signedUser = await request(app.server)
     .post('/signin')
@@ -121,14 +113,7 @@ describe('Meals and user routes', () => {
   })
 
   it("should list a meal", async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
-      name: "Matheus",
-      email: "matheus@email.com",
-      password: "123456",
-      confirmPassword: "123456"
-    })
+    createUser()
 
     const signedUser = await request(app.server)
     .post('/signin')
@@ -168,14 +153,7 @@ describe('Meals and user routes', () => {
   })
 
   it("should update a meal", async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
-      name: "Matheus",
-      email: "matheus@email.com",
-      password: "123456",
-      confirmPassword: "123456"
-    })
+    createUser()
 
     const signedUser = await request(app.server)
     .post('/signin')
@@ -213,14 +191,7 @@ describe('Meals and user routes', () => {
   })
 
   it("should delete a meal", async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
-      name: "Matheus",
-      email: "matheus@email.com",
-      password: "123456",
-      confirmPassword: "123456"
-    })
+    createUser()
 
     const signedUser = await request(app.server)
     .post('/signin')
@@ -254,14 +225,7 @@ describe('Meals and user routes', () => {
   })
 
   it("should list user status", async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
-      name: "Matheus",
-      email: "matheus@email.com",
-      password: "123456",
-      confirmPassword: "123456"
-    })
+    createUser()
 
     const signedUser = await request(app.server)
     .post('/signin')
