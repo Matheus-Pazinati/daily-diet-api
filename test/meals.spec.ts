@@ -17,6 +17,18 @@ describe('Meals and user routes', () => {
     return user
   }
 
+  async function signInUserCookie() {
+    const signedUser = await request(app.server)
+    .post('/signin')
+    .send({
+      email: "matheus@email.com",
+      password: "123456"
+    })
+
+    const authCookie = signedUser.headers['set-cookie']
+    return authCookie
+  }
+
   beforeAll( async () => {
     await app.ready()
   })
@@ -36,14 +48,15 @@ describe('Meals and user routes', () => {
   })
 
   it('should sign in user', async () => {
-    await request(app.server)
-    .post('/users')
-    .send({
+    const user = {
       name: "Pedro",
       email: "pedro@email.com",
       password: "123456",
       confirmPassword: "123456"
-    })
+    }
+    await request(app.server)
+    .post('/users')
+    .send(user)
 
     await request(app.server)
     .post('/signin')
@@ -56,15 +69,7 @@ describe('Meals and user routes', () => {
 
   it("should create a meal", async () => {
     createUser()
-
-    const signedUser = await request(app.server)
-    .post('/signin')
-    .send({
-      email: "matheus@email.com",
-      password: "123456"
-    })
-
-    const authCookie = signedUser.headers['set-cookie']
+    const authCookie = await signInUserCookie()
 
     await request(app.server)
     .post('/meals')
@@ -80,15 +85,7 @@ describe('Meals and user routes', () => {
 
   it("should list all meals", async () => {
     createUser()
-
-    const signedUser = await request(app.server)
-    .post('/signin')
-    .send({
-      email: "matheus@email.com",
-      password: "123456"
-    })
-
-    const authCookie = signedUser.headers['set-cookie']
+    const authCookie = await signInUserCookie()
 
     await request(app.server)
     .post('/meals')
@@ -114,15 +111,7 @@ describe('Meals and user routes', () => {
 
   it("should list a meal", async () => {
     createUser()
-
-    const signedUser = await request(app.server)
-    .post('/signin')
-    .send({
-      email: "matheus@email.com",
-      password: "123456"
-    })
-
-    const authCookie = signedUser.headers['set-cookie']
+    const authCookie = await signInUserCookie()
 
     await request(app.server)
     .post('/meals')
@@ -154,15 +143,7 @@ describe('Meals and user routes', () => {
 
   it("should update a meal", async () => {
     createUser()
-
-    const signedUser = await request(app.server)
-    .post('/signin')
-    .send({
-      email: "matheus@email.com",
-      password: "123456"
-    })
-
-    const authCookie = signedUser.headers['set-cookie']
+    const authCookie = await signInUserCookie()
 
     await request(app.server)
     .post('/meals')
@@ -192,15 +173,7 @@ describe('Meals and user routes', () => {
 
   it("should delete a meal", async () => {
     createUser()
-
-    const signedUser = await request(app.server)
-    .post('/signin')
-    .send({
-      email: "matheus@email.com",
-      password: "123456"
-    })
-
-    const authCookie = signedUser.headers['set-cookie']
+    const authCookie = await signInUserCookie()
 
     await request(app.server)
     .post('/meals')
@@ -226,15 +199,7 @@ describe('Meals and user routes', () => {
 
   it("should list user status", async () => {
     createUser()
-
-    const signedUser = await request(app.server)
-    .post('/signin')
-    .send({
-      email: "matheus@email.com",
-      password: "123456"
-    })
-
-    const authCookie = signedUser.headers['set-cookie']
+    const authCookie = await signInUserCookie()
 
     await request(app.server)
     .post('/meals')
