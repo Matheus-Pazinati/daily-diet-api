@@ -29,6 +29,20 @@ describe('Meals and user routes', () => {
     return authCookie
   }
 
+  async function createMeal(cookie: string) {
+    const meal =  await request(app.server)
+    .post('/meals')
+    .set("Cookie", cookie)
+    .send({
+      name: "Macarrão",
+      description: "Macarrão pizza",
+      mealDate: "2023-05-04T15:00:00Z",
+      onDiet: false
+    })
+
+    return meal
+  }
+
   beforeAll( async () => {
     await app.ready()
   })
@@ -71,31 +85,16 @@ describe('Meals and user routes', () => {
     createUser()
     const authCookie = await signInUserCookie()
 
-    await request(app.server)
-    .post('/meals')
-    .set("Cookie", authCookie)
-    .send({
-      name: "Macarrão",
-      description: "Macarrão pizza",
-      mealDate: "2023-05-04T15:00:00Z",
-      onDiet: false
-    })
-    .expect(201)
+    const meal = await createMeal(authCookie)
+
+    expect(meal.status).toBe(201)
   })
 
   it("should list all meals", async () => {
     createUser()
     const authCookie = await signInUserCookie()
 
-    await request(app.server)
-    .post('/meals')
-    .set("Cookie", authCookie)
-    .send({
-      name: "Macarrão",
-      description: "Macarrão pizza",
-      mealDate: "2023-05-04T15:00:00Z",
-      onDiet: false
-    })
+    createMeal(authCookie)
 
     const mealsResponse = await request(app.server)
     .get('/meals')
@@ -113,15 +112,7 @@ describe('Meals and user routes', () => {
     createUser()
     const authCookie = await signInUserCookie()
 
-    await request(app.server)
-    .post('/meals')
-    .set("Cookie", authCookie)
-    .send({
-      name: "Macarrão",
-      description: "Macarrão pizza",
-      mealDate: "2023-05-04T15:00:00Z",
-      onDiet: false
-    })
+    createMeal(authCookie)
 
     const mealsResponse = await request(app.server)
     .get('/meals')
@@ -145,15 +136,7 @@ describe('Meals and user routes', () => {
     createUser()
     const authCookie = await signInUserCookie()
 
-    await request(app.server)
-    .post('/meals')
-    .set("Cookie", authCookie)
-    .send({
-      name: "Macarrão",
-      description: "Macarrão pizza",
-      mealDate: "2023-05-04T15:00:00Z",
-      onDiet: false
-    })
+    createMeal(authCookie)
 
     const mealsResponse = await request(app.server)
     .get('/meals')
@@ -165,7 +148,7 @@ describe('Meals and user routes', () => {
     .put(`/meals/${mealId}`)
     .send({
       name: "Pizza",
-      description: "Rodíqzio de pizza"
+      description: "Rodízio de pizza"
     })
     .set("Cookie", authCookie)
     .expect(204)
@@ -175,15 +158,7 @@ describe('Meals and user routes', () => {
     createUser()
     const authCookie = await signInUserCookie()
 
-    await request(app.server)
-    .post('/meals')
-    .set("Cookie", authCookie)
-    .send({
-      name: "Macarrão",
-      description: "Macarrão pizza",
-      mealDate: "2023-05-04T15:00:00Z",
-      onDiet: false
-    })
+    createMeal(authCookie)
 
     const mealsResponse = await request(app.server)
     .get('/meals')
