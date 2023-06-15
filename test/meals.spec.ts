@@ -61,6 +61,12 @@ describe('Meals and user routes', () => {
     expect(createUserRequest.status).toBe(201)
   })
 
+  it.only('should not create a user with same emails', async () => {
+    await createUser()
+    
+    expect((await createUser()).status).toBe(500)
+  })
+
   it('should sign in user', async () => {
     const user = {
       name: "Pedro",
